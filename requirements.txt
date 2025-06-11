@@ -1,0 +1,4 @@
+asyncio
+paho-mqtt
+av
+numpy==1.24.4
