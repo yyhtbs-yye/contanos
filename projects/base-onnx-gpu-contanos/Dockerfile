@@ -19,6 +19,7 @@ RUN apt-get update && \
       libavutil-dev && \
     rm -rf /var/lib/apt/lists/*
 
+
 # 3. Install Miniconda3 into /opt/conda
 ENV CONDA_DIR=/opt/conda
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
@@ -40,13 +41,10 @@ RUN conda create -y -n onnx python=3.10 && \
 
 # 7. Install Python dependencies via pip
 RUN conda activate onnx && pip install --no-cache-dir \
-        av==14.4.0 \
-        numpy==1.26.2 \
         onnxruntime==1.22.0 \
-        opencv-python==4.11.0.86 \
-        opencv-contrib-python==4.11.0.86 \
-        paho-mqtt==2.1.0 \
-        tqdm
+        opencv-python==4.11.0.86
 
 # Must install 'onnxruntime-gpu' seperatly!!!
 RUN conda activate onnx && pip install onnxruntime-gpu==1.22.0
+
+RUN conda activate onnx && pip install git+https://github.com/yyhtbs-yye/contanos.git
