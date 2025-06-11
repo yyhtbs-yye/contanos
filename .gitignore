@@ -1,0 +1,7 @@
+output
+output/*
+__pycache__/*
+__pycache__
+*.png
+*.jpg
+*.mp4
