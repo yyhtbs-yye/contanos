@@ -12,19 +12,20 @@ from contanos.base_worker import BaseWorker
 from boxmot.trackers.bytetrack.bytetrack import ByteTrack
 from boxmot.trackers.bytetrack.bytetrack import STrack
 
+
 class ByteTrackWorker(BaseWorker):
     """ByteTrack tracking processor with single CPU serial processing."""
-    
-    def __init__(self, worker_id: int, device: str, 
+
+    def __init__(self, worker_id: int, device: str,
                  model_config: Dict,
-                 input_interface, 
+                 input_interface,
                  output_interface):
         super().__init__(worker_id, device, model_config,
                          input_interface, output_interface)
-    
+
     def _model_init(self):
         self.model = ByteTrack(**self.model_config)  # Use the specific device for this model
-        
+
     def _predict(self, input: Any, metadata: Any) -> Any:
 
         if int(metadata.get('frame_id_str').split('FRAME:')[-1]) <= self.model_config.get('starting_frame_id', 1):
@@ -35,7 +36,8 @@ class ByteTrackWorker(BaseWorker):
 
         dets = []
         for i in range(len(input['results']['det_scores'])):
-            dets.append([*input['results']['bboxes'][i], input['results']['det_scores'][i], input['results']['classes'][i]])
+            dets.append(
+                [*input['results']['bboxes'][i], input['results']['det_scores'][i], input['results']['classes'][i]])
 
         dets = np.array(dets)
         tracklets = self.model.update(dets)
@@ -44,4 +46,3 @@ class ByteTrackWorker(BaseWorker):
         bboxes = [[tracklet[0], tracklet[1], tracklet[2], tracklet[3]] for tracklet in tracklets]
         track_scores = [tracklet[5] for tracklet in tracklets]
         return {'scale': 1, 'bboxes': bboxes, 'track_scores': track_scores, 'track_ids': track_ids}
-

@@ -36,18 +36,19 @@ class AnnotationWorker(BaseWorker):
         track_scores = input[1]['results']['track_scores']
         scale = input[1]['results']['scale']
         keypoints = input[2]['results']['keypoints']
+        # print(f"bboxes: {bboxes}, track_ids: {track_ids}, track_scores: {track_scores}, scale: {scale}, keypoints: {keypoints}")
 
-
-        self.box_drawer.draw_boxes(frame, 
+        self.box_drawer.draw_boxes(frame,
                                    bboxes=bboxes,
                                    track_ids=track_ids,
                                    scores=track_scores,
                                    scale=scale)
-        frame = self.skeleton_drawer.draw_keypoints(frame, 
+        frame = self.skeleton_drawer.draw_keypoints(frame,
                                             keypoints=keypoints,
-                                            track_ids=[0.5 for i in range(len(keypoints))],
+                                            track_ids=track_ids,
                                             scale=scale)
-        # self.trajectory_drawer.draw_trajectories()
+
+        frame=self.trajectory_drawer.draw_trajectories(frame)
 
         return {'img': frame}
 

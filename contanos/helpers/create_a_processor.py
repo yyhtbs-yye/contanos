@@ -1,18 +1,17 @@
-
 import logging
-from typing import Dict, List, Optional, Callable, Any
+from typing import Dict, List, Optional, Callable, Any, Type, Tuple
 
 from contanos.base_worker import BaseWorker
 from contanos.base_processor import BaseProcessor
 
 
 def create_a_processor(
-    worker_class: type[BaseWorker],
+    worker_class: Type[BaseWorker],
     model_config,
     devices: List[str],
     input_interface, output_interface,
     num_workers_per_device: int = 1
-) -> tuple[List[BaseWorker], BaseProcessor]:
+) -> Tuple[List[BaseWorker], BaseProcessor]:
     """
     Helper function to create and initialize workers across multiple devices.
     

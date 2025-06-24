@@ -16,7 +16,9 @@ class MultiInputInterface:
         self._queue = asyncio.Queue(maxsize=1000)  # Stores completed {interface_idx: (data, metadata)}
         self._lock = asyncio.Lock()  # Protects _data_dict and _queue
         self._num_interfaces = len(interfaces)
-    
+        self.max_pending_frames = 1000
+        self._frame_id_order = []  # 存储 frame_id_str 顺序
+
     async def initialize(self) -> bool:
         """Initialize all input interfaces and start producers."""
         try:
@@ -51,18 +53,26 @@ class MultiInputInterface:
                 if frame_id_str is None:
                     logging.warning(f"Interface {interface_idx} provided no frame_id_str, skipping")
                     continue
-                
+
                 async with self._lock:
-                    # Add data to dictionary
+                    # Add new frame_id_str if not already present
+                    if frame_id_str not in self._data_dict:
+                        self._frame_id_order.append(frame_id_str)
+
                     self._data_dict[frame_id_str][interface_idx] = (data, metadata)
-                    logging.info(f"Interface {interface_idx} added data for frame_id_str: {frame_id_str}")
-                    
-                    # Check if all interfaces have contributed
+
+                    # If buffer too large, drop oldest
+                    if len(self._frame_id_order) > self.max_pending_frames:
+                        old_frame_id = self._frame_id_order.pop(0)
+                        if old_frame_id in self._data_dict:
+                            del self._data_dict[old_frame_id]
+                            logging.warning(f"Dropped frame {old_frame_id} due to pending overflow")
+
+                    # If this frame is now complete
                     if len(self._data_dict[frame_id_str]) == self._num_interfaces:
-                        # Push completed dictionary to queue
                         await self._queue.put(self._data_dict[frame_id_str])
-                        # Clean up dictionary
                         del self._data_dict[frame_id_str]
+                        self._frame_id_order.remove(frame_id_str)
             
             except Exception as e:
                 logging.error(f"Interface {interface_idx} error: {e}")

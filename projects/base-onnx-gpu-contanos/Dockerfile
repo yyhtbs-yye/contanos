@@ -47,4 +47,10 @@ RUN conda activate onnx && pip install --no-cache-dir \
 # Must install 'onnxruntime-gpu' seperatly!!!
 RUN conda activate onnx && pip install onnxruntime-gpu==1.22.0
 
-RUN conda activate onnx && pip install git+https://github.com/yyhtbs-yye/contanos.git
+# Copy and install local contanos package
+COPY contanos /opt/contanos_pkg/contanos
+COPY pyproject.toml /opt/contanos_pkg/
+WORKDIR /opt/contanos_pkg
+RUN conda activate onnx && pip install --root-user-action=ignore .
+
+WORKDIR /app

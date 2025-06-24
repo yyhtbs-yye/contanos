@@ -34,10 +34,23 @@ class RTSPInput(ABC):
     async def initialize(self) -> bool:
         """Initialize RTSP connection and start frame producer."""
         try:
-            logging.info(f"Connecting to RTSP stream: {self.addr} on {self.topic}")
-            # Run blocking AV initialization in executor
+            rtsp_url = f"{self.addr}/{self.topic}"
+            logging.info(f"Connecting to RTSP stream: {rtsp_url}")
+            
+            # Run blocking AV initialization in executor with TCP transport options
             loop = asyncio.get_event_loop()
-            self.container = await loop.run_in_executor(self._executor, av.open, self.addr+'/'+self.topic)
+            options = {
+                'rtsp_transport': 'tcp',  # Force TCP transport
+                'rtsp_flags': 'prefer_tcp',
+                'buffer_size': '64k',
+                'timeout': '5000000',  # 5 seconds in microseconds
+            }
+            
+            self.container = await loop.run_in_executor(
+                self._executor, 
+                lambda: av.open(rtsp_url, options=options)
+            )
+            
             self.video_stream = next(s for s in self.container.streams if s.type == 'video')
             self.frame_generator = self.container.demux(self.video_stream)
             self.is_running = True
