@@ -76,7 +76,7 @@ yolox:
 ```bash
 # Enter project directory
 cd projects/
-
+docker build -t contanos:base-onnx-gpu-contanos ./base-onnx-gpu-contanos
 # Start all services
 ./start_pose_estimation_services.sh start
 
