@@ -1,10 +1,14 @@
+import functools
 from typing import Any, Dict
 import logging
 import asyncio
 import subprocess
+
+import cv2
 import numpy as np
 
 from abc import ABC
+
 
 class RTSPOutput(ABC):
     """RTSP output implementation using ffmpeg subprocess + asyncio.Queue."""
@@ -29,20 +33,25 @@ class RTSPOutput(ABC):
     #
     # ───────────────────────────────  PUBLIC API  ────────────────────────────────
     #
+
     async def initialize(self) -> bool:
         """
         Configure and start the ffmpeg process for RTSP streaming.
         """
+        # self.width,self.height = await self._get_frames_dimensions()
+        logging.info(f'self.width, self.height = {self.width}, {self.height}')
+        logging.info(f'self.pixel_format = {self.pixel_format}')
+        logging.info(f'self.codec = {self.codec}')
+        logging.info(f'self.preset = {self.preset}')
+        logging.info(f'self.bitrate = {self.bitrate}')
         try:
             logging.info(f"Starting RTSP stream to {self.addr} on {self.topic}")
-
-            # --- 1. Build ffmpeg command --------------------------------------------
             ffmpeg_cmd = [
                 'ffmpeg',
                 '-f', 'rawvideo',
                 '-vcodec', 'rawvideo',
                 '-pix_fmt', 'rgb24',
-                '-s', f'{self.width}x{self.height}',
+                '-s', f"{self.width}x{self.height}",
                 '-r', str(self.fps),
                 '-i', '-',  # input from stdin
                 '-c:v', self.codec,
@@ -51,7 +60,7 @@ class RTSPOutput(ABC):
                 '-b:v', self.bitrate,
                 '-f', 'rtsp',
                 '-rtsp_transport', 'tcp',
-                self.addr+'/'+self.topic
+                self.addr + '/' + self.topic
             ]
 
             # --- 2. Start ffmpeg process -----------------------------------------
@@ -73,6 +82,13 @@ class RTSPOutput(ABC):
         except Exception as e:
             logging.error(f"Failed to initialize RTSP output: {e}")
             return False
+    async def _get_frames_dimensions(self):
+        """
+        Get the dimensions of the frames from the input interface.
+        """
+        frame_np = await self.queue.get()
+        return frame_np.shape[:2]
+
 
     #
     # ────────────────────────────────  PRODUCER  ────────────────────────────────
@@ -92,17 +108,17 @@ class RTSPOutput(ABC):
                 # Ensure frame is in correct format (RGB24)
                 if frame_np.dtype != np.uint8:
                     frame_np = frame_np.astype(np.uint8)
-                
                 # Ensure frame has correct dimensions
                 if frame_np.shape[:2] != (self.height, self.width):
-                    logging.warning(f"Frame dimensions {frame_np.shape[:2]} don't match expected {(self.height, self.width)}")
-                
-                # Off-load the blocking write to a thread:
-                await asyncio.to_thread(
-                    self._write_frame_to_ffmpeg,
-                    frame_np
-                )
-                
+                    # Resize or log a warning if dimensions don't match
+                    frame_np = cv2.resize(frame_np, (self.width, self.height), interpolation=cv2.INTER_LINEAR)
+                async def run_in_thread(func, *args, **kwargs):
+                    loop = asyncio.get_running_loop()
+                    return await loop.run_in_executor(None, functools.partial(func, *args, **kwargs))
+
+                # Off-load the blocking write to a thread:python 3.8
+                await run_in_thread(self._write_frame_to_ffmpeg, frame_np)
+
                 logging.debug(f"Streamed frame with shape {frame_np.shape}")
                 self.queue.task_done()
 
@@ -163,18 +179,18 @@ class RTSPOutput(ABC):
             try:
                 if self.process.stdin:
                     self.process.stdin.close()
-                
+
                 # Wait for process to terminate with timeout
                 try:
                     await asyncio.wait_for(
-                        asyncio.to_thread(self.process.wait), 
+                        asyncio.to_thread(self.process.wait),
                         timeout=5.0
                     )
                 except asyncio.TimeoutError:
                     logging.warning("FFmpeg process didn't terminate gracefully, killing it")
                     self.process.kill()
                     await asyncio.to_thread(self.process.wait)
-                    
+
             except Exception as e:
                 logging.error(f"Error during ffmpeg cleanup: {e}")
             finally:

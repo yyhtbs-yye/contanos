@@ -3,9 +3,11 @@
 YOLOX Detection Service using the simplified base framework with multi-GPU support.
 Reads RTSP frames, runs YOLOX detection, publishes bounding boxes to MQTT.
 """
-
+import os
+import sys
 from typing import Any, Dict
-
+import numpy as np
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
 from contanos.base_worker import BaseWorker
 from rtmlib.tools.object_detection import YOLOX
@@ -23,7 +25,15 @@ class YOLOXWorker(BaseWorker):
         self.model = YOLOX(**self.model_config,
                            device=self.device)  # Use the specific device for this model
         
-    def _predict(self, input: Any, metadata: Any) -> Any:
+    def _predict(self, inputs: Any, metadata: Any=None) -> Any:
+        model_output = self.model(inputs)
+        
+        # Handle the case where model returns only bboxes
+        if isinstance(model_output, tuple):
+            bboxes, det_scores = model_output
+        else:
+            # Model returns only bboxes, create default scores
+            bboxes = model_output
+            det_scores = np.ones(len(bboxes))  # Default confidence scores
 
-        bboxes, det_scores = self.model(input)
         return {'scale': 1, 'bboxes': bboxes, 'det_scores': det_scores, 'classes': [-1] * len(det_scores)}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Dict
 import logging
 import json
@@ -76,12 +78,8 @@ class MQTTOutput(ABC):
                 results = await asyncio.wait_for(self.queue.get(), timeout=1.0)
 
                 # Off-load the blocking publish to a thread:
-                await asyncio.to_thread(
-                    self.client.publish,
-                    self.topic,
-                    json.dumps(results, default=str),
-                    qos=self.qos,
-                )
+                loop = asyncio.get_running_loop()
+                await loop.run_in_executor(None, self.client.publish, self.topic, json.dumps(results, default=str), self.qos)
                 logging.debug(f"Published to {self.topic}: {results}")
                 self.queue.task_done()
 

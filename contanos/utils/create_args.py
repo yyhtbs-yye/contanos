@@ -43,12 +43,7 @@ def add_service_args(parser):
         default=os.getenv('DAEMON_MODE', 'false').lower() == 'true',
         help='Run in daemon mode'
     )
-    parser.add_argument(
-        '--log_level',
-        default=os.getenv('LOG_LEVEL', 'INFO'),
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logging level'
-    )
+
 
 def add_compute_args(parser):
     """Add compute configuration arguments to parser"""

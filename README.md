@@ -129,7 +129,7 @@ To run a Contanos container, use `docker run` with the appropriate environment v
   ```
   docker run -d --rm \
     -e IN_RTSP="rtsp://<CAMERA_IP>:8554/live,topic=mycam" \
-    -e OUT_MQTT="mqtt://<BROKER_IP>:1883,topic=yolox/detections,qos=1" \
+    -e OUT_MQTT="mqtt://localhost:1883,topic=yolox/detections,qos=1" \
     -e DEVICES="cuda:0" \
     contanos-yolox
   ```

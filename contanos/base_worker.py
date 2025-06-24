@@ -42,10 +42,12 @@ class BaseWorker:
         loop = asyncio.get_running_loop()
 
         """Run the worker, reading from input and writing to output."""
-        logging.info(f"Worker {self.worker_id} started on {self.device}")
+        # logging.info(f"Worker {self.worker_id} started on {self.device}")
         while True:
             try:
+                # logging.debug(f"Worker {self.worker_id} waiting for input data...")
                 input, metadata = await self.input_interface.read_data()
+                # logging.debug(f"Worker {self.worker_id} received input: type={type(input)}, metadata keys={list(metadata.keys()) if metadata else 'None'}")
 
                 results = await loop.run_in_executor(
                     self._executor,
@@ -56,11 +58,13 @@ class BaseWorker:
                     output = self._format_results(results, metadata)
                     await self.output_interface.write_data(output)
                     # self.results.append(results)  # Store for verification
-                    logging.debug(f"Worker {self.worker_id} on {self.device} processed input -> output")
+                    # logging.debug(f"Worker {self.worker_id} on {self.device} processed input -> output")
             except asyncio.TimeoutError:
                 logging.info(f"Worker {self.worker_id} on {self.device} timed out, stopping")
                 break
             except Exception as e:
                 logging.error(f"Worker {self.worker_id} on {self.device} error: {e}")
+                import traceback
+                # logging.error(f"Traceback: {traceback.format_exc()}")
                 break
         logging.info(f"Worker {self.worker_id} on {self.device} finished")

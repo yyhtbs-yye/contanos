@@ -1,0 +1,27 @@
+FROM contanos:base-onnx-gpu-contanos
+
+# Install PyYAML for configuration loading
+SHELL ["/bin/bash", "-lc"]
+RUN conda init bash
+RUN conda activate onnx
+
+RUN conda activate onnx && pip install --no-cache-dir --root-user-action=ignore \
+        opencv-contrib-python==4.11.0.86 \
+        paho-mqtt==2.1.0 \
+        tqdm \
+        PyYAML
+
+WORKDIR /app
+
+RUN conda activate onnx && pip install --root-user-action=ignore git+https://github.com/yyhtbs-yye/rtmlib_copy.git
+
+# Copy application files
+COPY rtmpose_main_yaml.py .
+COPY rtmpose_worker.py .
+
+# Command to run the service with YAML config
+CMD ["bash", "-lc", "conda activate onnx && \
+                     python rtmpose_main_yaml.py \
+                         --config /config/pose_estimation_config.yaml \
+                         --daemon_mode true \
+"] 

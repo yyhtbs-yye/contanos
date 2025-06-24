@@ -5,7 +5,7 @@ Handles drawing and management of point trajectories with history tracking,
 gap detection, and automatic cleanup of stale trajectories.
 """
 
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 from collections import defaultdict, deque
 import cv2
 import numpy as np
@@ -199,7 +199,7 @@ class TrajectoryDrawer:
                      color=color, 
                      thickness=self.line_thickness)
     
-    def get_trajectory_stats(self) -> Dict[str, any]:
+    def get_trajectory_stats(self) -> Dict[str, Any]:
         """
         Get statistics about current trajectories.
         

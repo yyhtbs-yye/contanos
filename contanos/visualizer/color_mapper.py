@@ -5,12 +5,12 @@ Provides efficient hash-based color generation with caching for consistent
 ID-to-color mapping across visualization components.
 """
 
-from typing import Dict, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 import hashlib
 
 
 class DeterministicColorMapper:
-    """Generates deterministic colors using hash-based mapping with caching."""
+    """Deterministic color mapper for consistent track ID coloring."""
     
     def __init__(self, default_color: Tuple[int, int, int] = (255, 0, 255)):
         """
@@ -24,13 +24,13 @@ class DeterministicColorMapper:
     
     def get_color(self, track_id: Optional[int]) -> Tuple[int, int, int]:
         """
-        Get deterministic BGR color for a tracking ID.
+        Get deterministic color for a track ID.
         
         Args:
             track_id: Tracking ID (None returns default color)
             
         Returns:
-            BGR color tuple (B, G, R) with values 0-255
+            BGR color tuple
         """
         if track_id is None:
             return self.default_color
@@ -39,24 +39,13 @@ class DeterministicColorMapper:
         if track_id in self._color_cache:
             return self._color_cache[track_id]
         
-        # Generate deterministic color using hash
+        # Generate new color
         color = self._generate_hash_color(track_id)
-        
-        # Cache the result
         self._color_cache[track_id] = color
-        
         return color
     
     def _generate_hash_color(self, track_id: int) -> Tuple[int, int, int]:
-        """
-        Generate deterministic color using hash function.
-        
-        Args:
-            track_id: Integer tracking ID
-            
-        Returns:
-            BGR color tuple
-        """
+        """Generate deterministic color from track ID using hash."""
         # Convert ID to bytes and hash
         id_bytes = str(track_id).encode('utf-8')
         hash_digest = hashlib.md5(id_bytes).hexdigest()
@@ -97,7 +86,7 @@ class DeterministicColorMapper:
         """Get number of cached colors."""
         return len(self._color_cache)
     
-    def get_cached_ids(self) -> list[int]:
+    def get_cached_ids(self) -> List[int]:
         """Get list of all cached track IDs."""
         return list(self._color_cache.keys())
 
