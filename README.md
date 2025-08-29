@@ -265,6 +265,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy...
 
 Contributions to Contanos are welcome! If you have ideas for improvements, find a bug, or want to add new features (such as support for additional input/output types or new example modules), please consider contributing:
 
+## Acknowledgement
+This work has received funding as an Open Call project under the aerOS project (”Autonomous, scalablE, tRustworthy, intelligent European meta Operating System for the IoT edgecloud continuum”), funded by the European Union’s Horizon Europe programme under grant agreement No. 101069732.
 
 
 - **Submit Issues**: If you encounter any problems or have questions, please open an issue on the GitHub repository. This helps track known issues and discussions.
