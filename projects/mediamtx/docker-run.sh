@@ -1,1 +1,0 @@
-docker run -d --name rtsp-server -p 8554:8554 -p 1935:1935 -e MTX_PROTOCOLS=tcp bluenviron/mediamtx:latest

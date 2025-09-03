@@ -1,1 +1,0 @@
-docker build -t mp4-rtsp-source-raw .
