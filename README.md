@@ -185,8 +185,8 @@ If the annotated stream is empty, ensure the producer topics (`yolox`, `bytetrac
 │   ├── prj-rtmpose-onnx/          # multi-person pose (RTMPose, ONNX)
 │   ├── prj-annotation-cpu/        # management of annotations
 │   ├── prj-annotator/             # video overlay + RTSP out
-│   ├── prj-jerseyocr-gpu/         # jersey OCR (optional)
-│   └── prj-cmc-cpu/               # CMC module (optional)
+│   ├── prj-jerseyocr-gpu/         # jersey OCR (optional, Pytorch)
+│   └── prj-cmc-cpu/               # CMC module (optional, Pytorch)
 ```
 
 > Note again: the **Contanos** sources are **not** present in this repository. Containers install `contanos-core` during image build; for local runs, clone `contanos-core` and use only the `contanos` folder.
