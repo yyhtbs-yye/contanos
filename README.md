@@ -1,8 +1,8 @@
-**Contanos STRIDE**
+**Contanos is Now STRIDE**
 
 This library is a copy of yyhtbs-yye (Yuhang Ye, TUS)'s SPARTA-STRIDE repo. https://github.com/yyhtbs-yye/sparta-stride
 
-We rename the repo to seperate the framework (Contanos Core) and implementation (STRIDE).
+We rename the repo to seperate the framework (contanos-core) and implementation (sparta-stride).
 
 License is the same. 
 
