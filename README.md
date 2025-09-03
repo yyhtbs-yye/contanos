@@ -6,6 +6,9 @@ We rename the repo to seperate the framework (Contanos Call) and implementation 
 
 License is the same. 
 
+# Acknowledgement
+This work has received funding as an Open Call project under the SPARTA project from the European Union's Horizon Europe programme (grant agreement No. 101069732).
+
 The STRIDE **README** is below:
 
 # Sport Real-time TRacking, Identification & DEtection, on top of Contanos [STRIDE]
