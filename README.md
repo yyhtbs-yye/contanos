@@ -7,7 +7,7 @@ We rename the repo to seperate the framework (contanos-core) and implementation 
 License is the same. 
 
 # Acknowledgement
-This work has received funding as an Open Call project under the SPARTA project from the European Union's Horizon Europe programme Autonomous, scalablE, tRustworthy, intelligent European meta Operating System for the IoT edge-cloud continuum (grant agreement No. 101069732).
+This work has received funding as an Open Call project under the SPARTA project from the European Union's Horizon Europe programme Autonomous, scalablE, tRustworthy, intelligent European meta Operating System for the IoT edge-cloud continuum (aerOS) (grant agreement No. 101069732).
 
 LINK: https://aeros-project.eu/
 
